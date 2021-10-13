@@ -1,0 +1,7 @@
+{
+  "name": "vigil-plant",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

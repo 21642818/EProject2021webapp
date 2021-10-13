@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "vigil-plant",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}
