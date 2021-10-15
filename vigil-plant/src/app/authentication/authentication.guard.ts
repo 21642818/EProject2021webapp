@@ -15,7 +15,8 @@ export class AuthenticationGuard implements CanActivate {
     return new Promise((resolve, reject) => {
       onAuthStateChanged(this.auth, (user) => {
         if (user) {
-          resolve(true);
+          //resolve(true);
+          this.router.navigateByUrl('/home')
         } else {
           reject('No user logged in');
           this.router.navigateByUrl('/login');

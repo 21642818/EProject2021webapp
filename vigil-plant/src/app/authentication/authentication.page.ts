@@ -50,7 +50,7 @@ export class AuthenticationPage implements OnInit {
       await this.auth.login(email, password);
       // This will give you an error since we don't have the / URL in our routes yet.
       // No worries, we'll add it soon enough.
-      this.router.navigateByUrl('');
+      this.router.navigateByUrl('home');
     } catch (error) {
         console.log('Either we couldn`t find your user or there was a problem with the password');
     }
@@ -59,7 +59,7 @@ export class AuthenticationPage implements OnInit {
     // This will hold the logic for the signup function.
     try {
       await this.auth.signup(email, password);
-      this.router.navigateByUrl('');
+      this.router.navigateByUrl('home');
     } catch (error) {
       console.log(error);
     };
