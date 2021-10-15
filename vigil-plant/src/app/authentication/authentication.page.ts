@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthenticationService } from './authentication.service';
 
 @Component({
   selector: 'app-authentication',
@@ -11,7 +12,7 @@ export class AuthenticationPage implements OnInit {
   url: string; // The URL we're at: login, signup, or reset.
   pageTitle = 'Sign In';
   actionButtonText = 'Sign In';
-  constructor(private readonly router: Router) {}
+  constructor(private readonly router: Router, private readonly auth: AuthenticationService ) {}
   
   ngOnInit() {
     // First we get the URL, and with that URL we send the
@@ -45,14 +46,32 @@ export class AuthenticationPage implements OnInit {
   }
   async login(email: string, password: string) {
     // This will hold the logic for the login function.
-    console.log(email, password);
+    try {
+      await this.auth.login(email, password);
+      // This will give you an error since we don't have the / URL in our routes yet.
+      // No worries, we'll add it soon enough.
+      this.router.navigateByUrl('');
+    } catch (error) {
+        console.log('Either we couldn`t find your user or there was a problem with the password');
+    }
   }
   async signup(email: string, password: string) {
     // This will hold the logic for the signup function.
-    console.log(email, password);
+    try {
+      await this.auth.signup(email, password);
+      this.router.navigateByUrl('');
+    } catch (error) {
+      console.log(error);
+    };
   }
   async resetPassword(email: string) {
     // This will hold the logic for the resetPassword function.
-    console.log(email);
+    try {
+      await this.auth.resetPassword(email);
+      console.log('Email Sent');
+      this.router.navigateByUrl('login')
+    } catch (error) {
+      console.log('Error: ', error)
+    }
   }
 }
