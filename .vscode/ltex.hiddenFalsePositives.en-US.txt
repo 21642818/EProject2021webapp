@@ -1,0 +1,2 @@
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QLevelsDetail\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QDashboardDetail\\E$"}

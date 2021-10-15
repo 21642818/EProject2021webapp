@@ -1,0 +1,7 @@
+{
+  "name": "vigilplant",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

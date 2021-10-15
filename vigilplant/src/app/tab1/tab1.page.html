@@ -1,0 +1,30 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Dashboard
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Dashboard</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card>
+    <ion-card-header> Line Chart </ion-card-header>
+    <ion-card-content>
+      <canvas #lineCanvas style="position: relative; height: 2rem;">
+      </canvas>
+    </ion-card-content>
+  </ion-card>
+
+<ion-list>
+    <ion-item *ngFor= "let data of dataList">
+      {{data.timestamp}} = {{data.soil_moisture}}
+    </ion-item>
+  </ion-list>
+
+</ion-content>
