@@ -15,8 +15,8 @@ import { environment } from 'src/environments/environment';
 /* Firebase CRUD service */
 import { FirebaseService } from './tabs/firebase.service';
 
-/* Charts */
-//import { Chart } from 'chart.js';
+/* Reactive Forms */
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AppComponent],
@@ -24,6 +24,7 @@ import { FirebaseService } from './tabs/firebase.service';
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
+    ReactiveFormsModule
   ],
   providers: [FirebaseService, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

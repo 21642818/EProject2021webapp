@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { connectListeners } from '@ionic/core/dist/types/utils/overlays';
 import { FirebaseService } from '../tabs/firebase.service';
 import Chart from 'chart.js/auto';
+import 'chartjs-adapter-luxon';
+import {DateTime} from 'luxon';
 
 @Component({
   selector: 'app-tab1',
@@ -9,12 +11,39 @@ import Chart from 'chart.js/auto';
   styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page{
+  public waterForm = [   
+    { val: 'Plant 1' , isChecked: true},  
+    { val: 'Plant 2' , isChecked: true},  
+    { val: 'Plant 3' , isChecked: true},  
+    { val: 'Plant 4' , isChecked: true}  
+  ];  
+
+  @ViewChild("valueLineCanvas1") valueLinesCanvas1
+  @ViewChild("valueLineCanvas2") valueLinesCanvas2
+  @ViewChild("valueLineCanvas3") valueLinesCanvas3
+  @ViewChild("valueLineCanvas4") valueLinesCanvas4
+  valueLinesChart1: any;
+  valueLinesChart2: any;
+  valueLinesChart3: any;
+  valueLinesChart4: any;
+  chartData = null;
 
   dataList: any [];
-  lineData: any [];
 
   constructor(private firebaseApi: FirebaseService) {
     this.fetchData();
+  }
+
+  waterCmd(event?: MouseEvent) {
+    if (event) { 
+      event.stopPropagation();
+      console.log(this.dataList);
+    }
+    
+  }
+
+  ionViewDidLoad() {
+    this.fetchData()
   }
 
   fetchData() {
@@ -33,14 +62,194 @@ export class Tab1Page{
         Object.keys(val).map(function(k){
           //resArray.push(val[k]);
           let timestamp = val[k]["date"]+"T"+val[k]["timestamp"]
-          resArray.push(new lineDataSet(timestamp, val[k]["soil_moisture"]))
+          resArray.push(new lineDataSet(timestamp,val[k]["soil_moisture"]))
           return resArray;
         });
       });
-      console.log(resArray);
-      Promise.resolve(true);
+      //console.log(resArray);
+      if (this.chartData) {
+        this.updateCharts(resArray)
+      } else {
+        this.createCharts(resArray)
+      }
       this.dataList = resArray;
     });    
+  }
+
+  getReportValue(num){
+    let reportValue = []
+    
+    for (let trans of this.chartData) {
+      //console.log(trans)
+      reportValue.push(trans.soil_moisture[num])
+    }
+    
+    return reportValue
+  }
+
+  getLabelValue() {
+    let labelValue = []
+    
+    for (let trans of this.chartData) {
+      labelValue.push(trans.timestamp)
+    }
+    return labelValue
+  }
+
+  createCharts(data: any){
+    this.chartData = data;
+
+    let chartLabel = this.getLabelValue();
+    let chartData1 = this.getReportValue(0);
+    console.log(chartData1);
+    let chartData2 = this.getReportValue(1);
+    let chartData3 = this.getReportValue(2);
+    let chartData4 = this.getReportValue(3);
+
+    // Create the chart
+    this.valueLinesChart1 = new Chart(this.valueLinesCanvas1.nativeElement, {
+      type: 'line',
+      data: {
+        labels: chartLabel,
+        datasets: [{
+          label: "Soil Sensor 1",
+          data: chartData1,
+          fill: false,
+          pointRadius: 0,
+          borderColor: '#ef476f',
+          backgroundColor: '#ef476f',
+          tension: 0.5
+        },],
+      },
+      options: {
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              unit: 'day',
+              minUnit: 'hour',
+            }
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    })
+    this.valueLinesChart2 = new Chart(this.valueLinesCanvas2.nativeElement, {
+      type: 'line',
+      data: {
+        labels: chartLabel,
+        datasets: [{
+          label: "Soil Sensor 2",
+          data: chartData2,
+          fill: false,
+          pointRadius: 0,
+          borderColor: '#ffd166',
+          backgroundColor: '#ffd166',
+          tension: 0.5
+        },],
+      },
+      options: {
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              unit: 'day',
+              minUnit: 'hour',
+            }
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    })
+    this.valueLinesChart3 = new Chart(this.valueLinesCanvas3.nativeElement, {
+      type: 'line',
+      data: {
+        labels: chartLabel,
+        datasets: [{
+          label: "Soil Sensor 3",
+          data: chartData3,
+          fill: false,
+          pointRadius: 0,
+          borderColor: '#06d6a0',
+          backgroundColor: '#06d6a0',
+          tension: 0.5
+        },],
+      },
+      options: {
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              unit: 'day',
+              minUnit: 'hour',
+            }
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    })
+    this.valueLinesChart4 = new Chart(this.valueLinesCanvas4.nativeElement, {
+      type: 'line',
+      data: {
+        labels: chartLabel,
+        datasets: [{
+          label: "Soil Sensor 4",
+          data: chartData4,
+          fill: false,
+          pointRadius: 0,
+          borderColor: '#118ab2',
+          backgroundColor: '#118ab2',
+          tension: 0.5
+        },],
+      },
+      options: {
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          x: {
+            type: "time",
+            time: {
+              unit: 'day',
+              minUnit: 'hour',
+            }
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    })
+  }
+  updateCharts(data: any) {
+    this.chartData = data;
+    let chartData1 = this.getReportValue(0);
+    let labelData = this.getLabelValue();
+    // Update our dataset
+    this.valueLinesChart1.data.datasets.forEach((dataset) => {
+      dataset.data = chartData1
+    });
+    this.valueLinesChart1.data.labels = labelData;
+    this.valueLinesChart1.update();
   }
 }
 
