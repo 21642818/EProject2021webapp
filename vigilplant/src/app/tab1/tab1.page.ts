@@ -1,9 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
-import { connectListeners } from '@ionic/core/dist/types/utils/overlays';
 import { FirebaseService } from '../tabs/firebase.service';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-luxon';
-import {DateTime} from 'luxon';
+import { FormBuilder, FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-tab1',
@@ -11,17 +10,14 @@ import {DateTime} from 'luxon';
   styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page{
-  public waterForm = [   
-    { val: 'Plant 1' , isChecked: true},  
-    { val: 'Plant 2' , isChecked: true},  
-    { val: 'Plant 3' , isChecked: true},  
-    { val: 'Plant 4' , isChecked: true}  
-  ];  
+  public wateringForm: FormGroup;  
+  public waterButtonDisabled : boolean;
 
   @ViewChild("valueLineCanvas1") valueLinesCanvas1
   @ViewChild("valueLineCanvas2") valueLinesCanvas2
   @ViewChild("valueLineCanvas3") valueLinesCanvas3
   @ViewChild("valueLineCanvas4") valueLinesCanvas4
+  @ViewChild("submitWater") submitWater
   valueLinesChart1: any;
   valueLinesChart2: any;
   valueLinesChart3: any;
@@ -30,20 +26,40 @@ export class Tab1Page{
 
   dataList: any [];
 
-  constructor(private firebaseApi: FirebaseService) {
+  constructor(private firebaseApi: FirebaseService, public fb: FormBuilder,) {
     this.fetchData();
+    this.waterForm();
   }
 
-  waterCmd(event?: MouseEvent) {
-    if (event) { 
-      event.stopPropagation();
-      console.log(this.dataList);
-    }
-    
+  waterForm(){
+    this.wateringForm = this.fb.group({
+      plant1: [],
+      plant2: [],
+      plant3: [],
+      plant4: [],
+    })
   }
 
-  ionViewDidLoad() {
-    this.fetchData()
+  submitCmd() {
+    //console.log(this.wateringForm.value);
+    this.waterButtonDisabled = true;
+    let wateringArr = [];
+    let wateringDict = this.wateringForm.value
+    Object.keys(wateringDict).map(function(val){
+      if (wateringDict[val]) {
+        wateringArr.push(1)
+      } else {
+        wateringArr.push(0)
+      }
+    })
+    this.firebaseApi.addCmd(wateringArr, null)
+    setTimeout(() => {
+      this.waterButtonDisabled = false;
+    }, 30000)
+  }
+
+  unlock(){
+    this.waterButtonDisabled = false;
   }
 
   fetchData() {
@@ -101,7 +117,6 @@ export class Tab1Page{
 
     let chartLabel = this.getLabelValue();
     let chartData1 = this.getReportValue(0);
-    console.log(chartData1);
     let chartData2 = this.getReportValue(1);
     let chartData3 = this.getReportValue(2);
     let chartData4 = this.getReportValue(3);
@@ -133,7 +148,7 @@ export class Tab1Page{
             time: {
               unit: 'day',
               minUnit: 'hour',
-            }
+            },
           }
         },
         responsive: true,
@@ -243,16 +258,34 @@ export class Tab1Page{
   updateCharts(data: any) {
     this.chartData = data;
     let chartData1 = this.getReportValue(0);
+    let chartData2 = this.getReportValue(1);
+    let chartData3 = this.getReportValue(2);
+    let chartData4 = this.getReportValue(3);
     let labelData = this.getLabelValue();
     // Update our dataset
     this.valueLinesChart1.data.datasets.forEach((dataset) => {
       dataset.data = chartData1
     });
+    this.valueLinesChart2.data.datasets.forEach((dataset) => {
+      dataset.data = chartData2
+    });
+    this.valueLinesChart3.data.datasets.forEach((dataset) => {
+      dataset.data = chartData3
+    });
+    this.valueLinesChart4.data.datasets.forEach((dataset) => {
+      dataset.data = chartData4
+    });
     this.valueLinesChart1.data.labels = labelData;
     this.valueLinesChart1.update();
+    this.valueLinesChart2.data.labels = labelData;
+    this.valueLinesChart2.update();
+    this.valueLinesChart3.data.labels = labelData;
+    this.valueLinesChart3.update();
+    this.valueLinesChart4.data.labels = labelData;
+    this.valueLinesChart4.update();
+
   }
 }
-
 export class lineDataSet {
   timestamp: Date;
   soil_moisture: Number [];
