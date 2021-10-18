@@ -18,6 +18,7 @@ export class Tab1Page{
   @ViewChild("valueLineCanvas3") valueLinesCanvas3
   @ViewChild("valueLineCanvas4") valueLinesCanvas4
   @ViewChild("submitWater") submitWater
+  @ViewChild("checkboxWater") checkboxWater
   valueLinesChart1: any;
   valueLinesChart2: any;
   valueLinesChart3: any;
@@ -53,13 +54,14 @@ export class Tab1Page{
       }
     })
     this.firebaseApi.addCmd(wateringArr, null)
+    this.resetForm()
     setTimeout(() => {
       this.waterButtonDisabled = false;
     }, 30000)
   }
 
-  unlock(){
-    this.waterButtonDisabled = false;
+  resetForm(){
+    this.wateringForm.reset()
   }
 
   fetchData() {

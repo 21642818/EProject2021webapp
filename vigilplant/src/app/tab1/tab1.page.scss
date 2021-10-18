@@ -10,3 +10,22 @@ ion-checkbox{
     border-color: rgb(28, 28, 29);
     border-style: none !important;
 }
+
+$grid-breakpoints: (
+  sm: 0,
+  md: 768px,
+  lg: 1024px
+);
+$grid-max-widths: (
+  sm: 420px,
+  md: 720px,
+  lg: 960px
+);
+
+.button-active{
+    color: 'medium';
+    }
+    
+.button-standard{
+    color: 'primary';
+}
