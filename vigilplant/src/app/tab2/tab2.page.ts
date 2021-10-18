@@ -1,5 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { FirebaseService } from '../tabs/firebase.service';
+import { ModalController } from '@ionic/angular';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-luxon';
 
@@ -15,8 +17,19 @@ export class Tab2Page {
   chartData = null;
 
   dataList: any [];
+  imagePaths: any[];
+  imageRef: any;
 
-  constructor(private firebaseApi: FirebaseService) {
+  defaultImg = '../assets/default-img.jpg'
+
+  sliderOpts = {
+    zoom: false,
+    slidesPerView: 1.1,
+    centredSlides: true,
+    spaceBetween: 10,
+  }
+
+  constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage, private modalController: ModalController) {
     this.fetchData();
   }
 
@@ -25,6 +38,7 @@ export class Tab2Page {
   }
 
   fetchData() {
+    var lastImagePath: any;
     let dataRes = this.firebaseApi.getDataList();
     dataRes.snapshotChanges().subscribe(res => {
       let datestampArray = [];
@@ -36,11 +50,16 @@ export class Tab2Page {
           return datestampArray;
         });
       });
-      datestampArray.forEach(function(val){
-        Object.keys(val).map(function(k){
+      datestampArray.forEach((val)=>{
+        Object.keys(val).map((k)=>{
           //resArray.push(val[k]);
           let timestamp = val[k]["date"]+"T"+val[k]["timestamp"]
           resArray.push(new lineDataSet(timestamp,val[k]["soil_moisture"]))
+          let prev_ImagePath = val[k]['img_path']
+          console.log(val[k]['img_path'])
+          if (prev_ImagePath != null) {
+            lastImagePath = val[k]['img_path'];
+          }
           return resArray;
         });
       });
@@ -51,7 +70,28 @@ export class Tab2Page {
         this.createCharts(resArray)
       }
       this.dataList = resArray;
+      //console.log(lastImagePath)
+      this.imageRef = this.fbStorage.ref("/"+lastImagePath).getDownloadURL();
+      //console.log(this.imageRef)
     });    
+  }
+  
+  ionImgWillLoad(){
+    
+  }
+
+  fetchImg(imgPath){
+    try {
+      //this.imageRef = this.fbStorage.ref("/"+imgPath).getDownloadURL();
+    }
+    catch(err) {
+      console.log(err)
+    }
+    //return this.imageRef
+  }
+
+  openPreview() {
+
   }
 
   getReportValue(num){
@@ -141,7 +181,7 @@ export class Tab2Page {
           }
         },
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         aspectRatio: 3,
       },
     })

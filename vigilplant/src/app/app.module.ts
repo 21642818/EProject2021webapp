@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 /* Firebase */
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { environment } from 'src/environments/environment';
 
 /* Firebase CRUD service */
@@ -24,6 +25,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
+    AngularFireStorageModule,
     ReactiveFormsModule
   ],
   providers: [FirebaseService, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],

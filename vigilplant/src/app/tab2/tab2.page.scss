@@ -1,0 +1,17 @@
+div.img img {
+    border-radius: 2%;
+    display: inline;
+    width: auto;
+    margin: auto;
+    object-fit : contain ;
+    align-items: center;
+    display: block;
+}
+
+ion-col ion-row ion-card{
+    display: flex;
+    align-items: center;
+    justify-content: center;    
+    flex-wrap: wrap;
+    align-content: center;
+}
