@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-tabs',
@@ -7,6 +8,8 @@ import { Component } from '@angular/core';
 })
 export class TabsPage {
 
-  constructor() {}
+  constructor( private angularFireAuth: AngularFireAuth) {
+    this.angularFireAuth.signInWithEmailAndPassword('gerth.mmarais@gmail.com','secret12345')
+  }
 
 }

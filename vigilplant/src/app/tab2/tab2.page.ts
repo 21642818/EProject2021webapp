@@ -56,7 +56,7 @@ export class Tab2Page {
           let timestamp = val[k]["date"]+"T"+val[k]["timestamp"]
           resArray.push(new lineDataSet(timestamp,val[k]["soil_moisture"]))
           let prev_ImagePath = val[k]['img_path']
-          console.log(val[k]['img_path'])
+          //console.log(val[k]['img_path'])
           if (prev_ImagePath != null) {
             lastImagePath = val[k]['img_path'];
           }
@@ -75,10 +75,6 @@ export class Tab2Page {
       //console.log(this.imageRef)
     });    
   }
-  
-  ionImgWillLoad(){
-    
-  }
 
   fetchImg(imgPath){
     try {
@@ -88,10 +84,6 @@ export class Tab2Page {
       console.log(err)
     }
     //return this.imageRef
-  }
-
-  openPreview() {
-
   }
 
   getReportValue(num){
@@ -194,11 +186,7 @@ export class Tab2Page {
     let chartData4 = this.getReportValue(3);
     let labelData = this.getLabelValue();
     // Update our dataset
-    
-    this.valueLinesChart.data.datasets[0] = chartData1;
-    this.valueLinesChart.data.datasets[1] = chartData2;
-    this.valueLinesChart.data.datasets[2] = chartData3;
-    this.valueLinesChart.data.datasets[3] = chartData4;
+    this.valueLinesChart.data.datasets = [chartData1, chartData2, chartData3, chartData4,];
     this.valueLinesChart.data.labels = labelData;
     this.valueLinesChart.update();
   }
