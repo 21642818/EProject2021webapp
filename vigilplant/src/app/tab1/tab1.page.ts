@@ -4,6 +4,7 @@ import Chart from 'chart.js/auto';
 import 'chartjs-adapter-luxon';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { FormBuilder, FormGroup} from '@angular/forms';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab1',
@@ -37,11 +38,16 @@ export class Tab1Page{
   firstDate: any;
   pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  constructor(private firebaseApi: FirebaseService, public fb: FormBuilder,) {
+  constructor(private firebaseApi: FirebaseService, public fb: FormBuilder, private alertController: AlertController) {
     Chart.register(annotationPlugin);
     this.fetchData();
     this.waterForm();
     this.trigForm();
+  }
+
+  ngOnInit() {
+    //Chart.register(annotationPlugin);
+    this.fetchData();
   }
 
   waterForm(){
@@ -87,7 +93,6 @@ export class Tab1Page{
   }
 
   submitCmd() {
-    //console.log(this.wateringForm.value);
     this.waterButtonDisabled = true;
     let wateringArr = [];
     let wateringDict = this.wateringForm.value
@@ -106,14 +111,17 @@ export class Tab1Page{
   }
 
   submitTrig(){
-    console.log(this.triggersKey)
-    console.log(this.triggersList)
     let tempTrigList = [];
     if (this.triggersList != undefined){
       for (let index = 0; index < 4; index++) {
         tempTrigList.push(Math.ceil(1000*((this.triggersList[index]/100)*(this.calibrationMax[index]- +this.calibrationMin[index])))/1000)
       }
-      this.firebaseApi.updateTrig(tempTrigList, this.triggersKey)
+      try {
+        this.firebaseApi.updateTrig(tempTrigList, this.triggersKey)
+        this.presentAlert()
+      } catch (error) {
+       console.log(error) 
+      }
     }
   }
 
@@ -143,6 +151,21 @@ export class Tab1Page{
       this.pastDate = this.firstDate
     }
     this.updateCharts(this.chartData)
+  }
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      //cssClass: '',
+      header: 'Success',
+      //subHeader: 'Subtitle',
+      message: 'Triggers have been updated',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
   }
 
   fetchData() {
@@ -249,15 +272,6 @@ export class Tab1Page{
           backgroundColor: 'rgb(239, 71, 111, 0.2)',
           tension: 0.5
           },
-          {
-            label: "Soil Sensor 1 Trigger",
-            data: this.triggersList[0],
-            fill: false,
-            pointRadius: 0,
-            borderColor: 'rgb(239, 71, 111, 1)',
-            backgroundColor: 'rgb(239, 71, 111, 0.2)',
-            tension: 0.5
-            },
         ],
       },
       options: {

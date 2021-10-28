@@ -32,7 +32,9 @@
               }
             ],
             "styles": ["src/theme/variables.scss", "src/global.scss"],
-            "scripts": [],
+            "scripts": [
+              "src/app/opencv.js"
+            ],
             "aot": false,
             "vendorChunk": true,
             "extractLicenses": false,

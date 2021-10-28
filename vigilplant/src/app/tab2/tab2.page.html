@@ -13,29 +13,6 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-grid class='ion-no-padding' >
-    <ion-row>
-      <ion-col style="justify-content: center;" class='ion-no-padding' size-lg=6 size-md=12 size-sm=12 size-xs=12>
-        <ion-card>
-          <ion-card-header>Image</ion-card-header>
-          <ion-card-content>
-            <div class="img" *ngIf="imageRef | async; let url">
-              <img [src]="url" alt="Image from AngularFireStorage">
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col style="justify-content: center;" class='ion-no-padding'>
-        <ion-card>
-          <ion-card-header>VARI</ion-card-header>
-          <ion-card-content>
-              VARI Image Content
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
   <ion-card>
     <ion-card-header>Detail</ion-card-header>
     <ion-card-content>
@@ -74,5 +51,28 @@
       </ion-grid>
     </ion-card-content>
   </ion-card>
+
+  <ion-grid class='ion-no-padding' >
+    <ion-row>
+      <ion-col style="justify-content: center;" class='ion-no-padding' size-lg=6 size-md=12 size-sm=12 size-xs=12>
+        <ion-card>
+          <ion-card-header>Image - {{imageRefTimeStamp}}</ion-card-header>
+          <ion-card-content style='justify-content: center;'>
+            <div class="img" *ngIf="imageRef | async; let url">
+              <img [src]="url" alt="Image from AngularFireStorage">
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col style="justify-content: center;" class='ion-no-padding'>
+        <ion-card>
+          <ion-card-header>VARI</ion-card-header>
+          <ion-card-content>
+              VARI Image Content
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
 </ion-content>

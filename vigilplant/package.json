@@ -36,6 +36,7 @@
     "date-fns": "^2.25.0",
     "firebase": "^9.1.3",
     "gulp": "^4.0.2",
+    "jimp": "^0.16.1",
     "luxon": "^2.0.2",
     "moment": "^2.29.1",
     "ng-lazy-load-image": "^0.1.5",

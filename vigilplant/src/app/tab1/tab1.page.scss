@@ -12,9 +12,11 @@ ion-checkbox{
     mode: 'md'
 }
 
-.button-date-range{
-  color: 'medium';
-  min-width: 15%;
+
+
+.chart-container{
+  position: relative; 
+  height: 23vh;
 }
 
 $grid-breakpoints: (
@@ -30,7 +32,25 @@ $grid-max-widths: (
 
 ion-range{
   --pin: true;
-  --height: 1vh;
+  --height: 0.2vh;
+}
+
+ion-col{
+  --ion-grid-column-padding: 0% !important;
+}
+
+ion-col.center-any-object {
+  display: flex;
+  justify-content: center;
+}
+
+ion-grid{
+  --ion-grid-padding: 0% !important;
+}
+
+.button-date-range{
+  color: 'medium';
+  min-width: 2.7vw;
 }
 
 .range-1{

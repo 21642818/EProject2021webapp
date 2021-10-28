@@ -20,7 +20,6 @@ import { FirebaseService } from './tabs/firebase.service';
 /* Reactive Forms */
 import { ReactiveFormsModule } from '@angular/forms';
 
-
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],

@@ -1,9 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { FirebaseService } from '../tabs/firebase.service';
-import { ModalController } from '@ionic/angular';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-luxon';
+import cv from "../../assets/js/opencv.js"
 
 @Component({
   selector: 'app-tab2',
@@ -26,8 +26,9 @@ export class Tab2Page {
   dataList: any [];
   imagePaths: any[];
   imageRef: any;
+  imageRefTimeStamp: any;
   firstDate: any;
-  pastDate = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+  pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   defaultImg = '../assets/default-img.jpg'
 
@@ -38,7 +39,7 @@ export class Tab2Page {
     spaceBetween: 10,
   }
 
-  constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage, private modalController: ModalController) {
+  constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage) {
     this.fetchData();
   }
 
@@ -82,6 +83,7 @@ export class Tab2Page {
       this.calibrationMin = res[resSize].payload.val()['min'];
     })
     var lastImagePath: any;
+    var lastImageStamp: any;
     let dataRes = this.firebaseApi.getDataList();
     dataRes.snapshotChanges().subscribe(res => {
       let datestampArray = [];
@@ -113,6 +115,7 @@ export class Tab2Page {
           let prev_ImagePath = val[k]['img_path']
           if (prev_ImagePath != null) {
             lastImagePath = val[k]['img_path'];
+            lastImageStamp = timestamp;
           }
           tList.push(val[k]["temp_humid"][0]);
           hList.push(val[k]["temp_humid"][1]);
@@ -129,8 +132,14 @@ export class Tab2Page {
       }
       this.dataList = resArray;
       this.imageRef = this.fbStorage.ref("/"+lastImagePath).getDownloadURL();
-      console.log(this.tempList)
+      this.imageRefTimeStamp = new Date(lastImageStamp).toLocaleString('en-ZA');
     });    
+  }
+
+  chartHidden(){
+    if (this.valueLinesChart != undefined){
+      //console.log(!this.valueLinesChart.data.datasets[4].hidden)
+    }
   }
 
   getReportValue(num){
@@ -173,40 +182,40 @@ export class Tab2Page {
             label: "Soil Sensor 1",
             data: chartData1,
             fill: false,
+            animation:false,
             pointRadius: 2,
             borderColor: '#ef476f',
             backgroundColor: '#ef476f',
-            tension: 0.5,
             yAxisID: 'y',
           },
           {
             label: "Soil Sensor 2",
             data: chartData2,
             fill: false,
+            animation:false,
             pointRadius: 2,
             borderColor: '#ffd166',
             backgroundColor: '#ffd166',
-            tension: 0.5,
             yAxisID: 'y',
           },
           {
             label: "Soil Sensor 3",
             data: chartData3,
             fill: false,
+            animation:false,
             pointRadius: 2,
             borderColor: '#06d6a0',
             backgroundColor: '#06d6a0',
-            tension: 0.5,
             yAxisID: 'y',
           },
           {
             label: "Soil Sensor 4",
             data: chartData4,
             fill: false,
+            animation:false,
             pointRadius: 2,
             borderColor: '#118ab2',
             backgroundColor: '#118ab2',
-            tension: 0.5,
             yAxisID: 'y',
           },
           {
@@ -216,7 +225,6 @@ export class Tab2Page {
             pointRadius: 2,
             borderColor: 'rgb(253, 32, 192, 0.8)',
             backgroundColor: 'rgb(253, 32, 192, 0.1)',
-            tension: 0.5,
             yAxisID: 'y1',
             hidden: true,
           },
@@ -227,7 +235,6 @@ export class Tab2Page {
             pointRadius: 2,
             borderColor: 'rgb(233, 229, 245, 0.8)',
             backgroundColor: 'rgb(233, 229, 245, 0.1)',
-            tension: 0.5,
             yAxisID: 'y2',
             hidden: true,
           },
@@ -237,6 +244,10 @@ export class Tab2Page {
         plugins: {
           legend: {
             display: true
+          },
+          decimation: {
+            enabled: true,
+            algorithm: 'min-max',
           }
         },
         scales: {
@@ -255,7 +266,7 @@ export class Tab2Page {
           },
           y1: {
             type: 'linear',
-            display: true,
+            display: false,
             position: 'right',
             grid: {
               drawOnChartArea: false, 
@@ -264,14 +275,14 @@ export class Tab2Page {
               callback: function(value, index, values) {
                   return value + '°C';
               }
-            }
+            },
           },
           y2: {
             type: 'linear',
-            display: true,
+            display: false,
             position: 'right',
             grid: {
-              drawOnChartArea: false, 
+              drawOnChartArea: false,
             },
             ticks: {
               callback: function(value, index, values) {
@@ -280,9 +291,15 @@ export class Tab2Page {
             }
           }
         },
+        elements:{
+          point:{
+            radius:0,
+          }
+        },
         responsive: true,
         maintainAspectRatio: false,
         aspectRatio: 3,
+        spanGaps: true,
       },
     })
     this.valueTempHumidChart = new Chart(this.valueTempHumid.nativeElement, {
@@ -297,7 +314,6 @@ export class Tab2Page {
             pointRadius: 2,
             borderColor: '#ef24c3',
             backgroundColor: 'rgb(253, 32, 192, 0.1)',
-            tension: 0.5,
             yAxisID: 'y',
           },
           {
@@ -307,7 +323,6 @@ export class Tab2Page {
             pointRadius: 2,
             borderColor: '#e8e5f6',
             backgroundColor: 'rgb(233, 229, 245, 0.1)',
-            tension: 0.5,
             yAxisID: 'y1',
           },
         ]
@@ -357,6 +372,7 @@ export class Tab2Page {
         responsive: true,
         maintainAspectRatio: false,
         aspectRatio: 3,
+        spanGaps: true
       },
       
     })
