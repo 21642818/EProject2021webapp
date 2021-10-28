@@ -42,6 +42,36 @@
       <div class="chart-container" style='position: relative; height: 50ch;'>
         <canvas #valueLineCanvas></canvas>
       </div>
+      <div class="chart-container" style='position: relative; height: 50ch;'>
+        <canvas #valueLineCanvasTempHumid></canvas>
+      </div>
+      <ion-grid style="justify-content: center;" class="ion-no-padding">
+        <ion-col>
+          <ion-button class='button-date-range' (click)='oneDay()'>
+            <ion-label>1D</ion-label>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button class='button-date-range' (click)='fiveDays()'>
+            <ion-label>5D</ion-label>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button class='button-date-range' (click)='sevenDays()'>
+            <ion-label>7D</ion-label>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button class='button-date-range' (click)='oneWeek()'>
+            <ion-label>1W</ion-label>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button class='button-date-range' (click)='oneMonth()'>
+            <ion-label>1M</ion-label>
+          </ion-button>
+        </ion-col>
+      </ion-grid>
     </ion-card-content>
   </ion-card>
 

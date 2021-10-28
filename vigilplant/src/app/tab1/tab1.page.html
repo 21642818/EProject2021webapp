@@ -14,101 +14,155 @@
   </ion-header>
 
   <ion-grid>
-    <ion-row class='ion-no-padding'>
-      <ion-col class='ion-no-padding' size-lg=6 size-md=12 size-sm=12 size-xs=12>
-        <ion-card>
-          <ion-card-header>Plant 1</ion-card-header>
+    <form [formGroup]='triggerForm' (ionChange)='trigValchange()' novalidate>
+      <ion-row ion-no-padding>
+        <ion-col ion-no-padding size-lg=6 size-md=12 size-sm=12 size-xs=12>
+          <ion-card>
+            <ion-card-header>Plant 1</ion-card-header>
+            <ion-card-content>
+              <div class="chart-container" style='position: relative; height: 25vh;'>
+                <canvas #valueLineCanvas1></canvas>
+              </div>
+              <ion-range mode='md' debounce=50 formControlName='rangeValue1' class="range-1" pin></ion-range>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col ion-no-padding size-lg=6 size-md=12 size-sm=12 size-xs=12>
+          <ion-card>
+            <ion-card-header>Plant 2</ion-card-header>
+            <ion-card-content>
+              <div class="chart-container" style='position: relative; height: 25vh;'>
+                <canvas #valueLineCanvas2></canvas>
+              </div>
+              <ion-range mode='md' debounce=50 formControlName='rangeValue2' class="range-2" pin></ion-range>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      <ion-row ion-no-padding>
+        <ion-col ion-no-padding size-lg=6 size-md=12 size-sm=12 size-xs=12>
+          <ion-card>
+            <ion-card-header>Plant 3</ion-card-header>
+            <ion-card-content>
+              <div class="chart-container" style='position: relative; height: 25vh;'>
+                <canvas #valueLineCanvas3></canvas>
+              </div>
+              <ion-range mode='md' debounce=50 formControlName='rangeValue3' class="range-3" pin></ion-range>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col ion-no-padding size-lg=6 size-md=12 size-sm=12 size-xs=12>
+          <ion-card>
+            <ion-card-header>Plant 4</ion-card-header>
+            <ion-card-content>
+              <div class="chart-container" style='position: relative; height: 25vh;'>
+                <canvas #valueLineCanvas4></canvas>
+              </div>
+              <ion-range mode='md' debounce=50 formControlName='rangeValue4' class="range-4" pin></ion-range>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </form>
+  </ion-grid>
+
+  <ion-grid>
+    <ion-row >
+      <ion-col style="justify-content: center;">
+        <ion-card style="width: fit-content;">
+          <ion-card-header>Date Range & Triggers</ion-card-header>
           <ion-card-content>
-            <div class="chart-container" style='position: relative; height: 25vh;'>
-              <canvas #valueLineCanvas1></canvas>
-            </div>
+            <ion-grid style="justify-content: left; " class="ion-no-padding">
+              <ion-row>
+                <ion-col>
+                  <ion-button class='button-date-range' (click)='oneDay()'>
+                    <ion-label>1D</ion-label>
+                  </ion-button>
+                </ion-col>
+                <ion-col>
+                  <ion-button class='button-date-range' (click)='fiveDays()'>
+                    <ion-label>5D</ion-label>
+                  </ion-button>
+                </ion-col>
+                <ion-col>
+                  <ion-button class='button-date-range' (click)='sevenDays()'>
+                    <ion-label>7D</ion-label>
+                  </ion-button>
+                </ion-col>
+                <ion-col>
+                  <ion-button class='button-date-range' (click)='oneWeek()'>
+                    <ion-label>2W</ion-label>
+                  </ion-button>
+                </ion-col>
+                <ion-col>
+                  <ion-button class='button-date-range' (click)='oneMonth()'>
+                    <ion-label>1M</ion-label>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+              <ion-row style="justify-content: center;">
+                <ion-button color="light" size='small' (click)='submitTrig()'>
+                  <ion-icon name="cloud-upload-outline"></ion-icon>
+                  <ion-label>Triggers</ion-label>
+                </ion-button>  
+              </ion-row>
+            </ion-grid>
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col class='ion-no-padding' size-lg=6 size-md=12 size-sm=12 size-xs=12>
+      <ion-col size-lg=9.8 size-md=12 size-sm=12 size-xs=12>
         <ion-card>
-          <ion-card-header>Plant 2</ion-card-header>
+          <ion-card-header>Water</ion-card-header>
           <ion-card-content>
-            <div class="chart-container" style='position: relative; height: 25vh;'>
-              <canvas #valueLineCanvas2></canvas>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-    <ion-row class='ion-no-padding'>
-      <ion-col class='ion-no-padding' size-lg=6 size-md=12 size-sm=12 size-xs=12>
-        <ion-card>
-          <ion-card-header>Plant 3</ion-card-header>
-          <ion-card-content>
-            <div class="chart-container" style='position: relative; height: 25vh;'>
-              <canvas #valueLineCanvas3></canvas>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col class='ion-no-padding' size-lg=6 size-md=12 size-sm=12 size-xs=12>
-        <ion-card>
-          <ion-card-header>Plant 4</ion-card-header>
-          <ion-card-content>
-            <div class="chart-container" style='position: relative; height: 25vh;'>
-              <canvas #valueLineCanvas4></canvas>
-            </div>
+            <form [formGroup]='wateringForm' (ngSubmit)='submitCmd()' novalidate >
+              <ion-grid>
+                <ion-row style="justify-content: left;">
+                  <ion-col>
+                    <ion-row style="justify-content: center;">
+                      <ion-checkbox mode="md" formControlName='plant1' #checkboxWater></ion-checkbox>
+                    </ion-row>
+                    <ion-row style="justify-content: center;">
+                      <ion-label  style="font-size: 80%;">Plant 1</ion-label>
+                    </ion-row>            
+                  </ion-col>
+                  <ion-col>
+                    <ion-row style="justify-content: center;">
+                      <ion-checkbox mode="md" formControlName='plant2' #checkboxWater></ion-checkbox>
+                    </ion-row>
+                    <ion-row style="justify-content: center;">
+                      <ion-label style="font-size: 80%;">Plant 2</ion-label>
+                    </ion-row>
+                  </ion-col>
+                  <ion-col>
+                    <ion-row style="justify-content: center;">
+                      <ion-checkbox mode="md" formControlName='plant3' #checkboxWater></ion-checkbox>
+                    </ion-row>
+                    <ion-row style="justify-content: center;">
+                      <ion-label style="font-size: 80%;">Plant 3</ion-label>
+                    </ion-row>
+                  </ion-col>
+                  <ion-col>
+                    <ion-row style="justify-content: center;">
+                      <ion-checkbox mode="md" formControlName='plant4' #checkboxWater></ion-checkbox>
+                    </ion-row>
+                    <ion-row style="justify-content: center;">
+                      <ion-label style="font-size: 80%;">Plant 4</ion-label>
+                    </ion-row>
+                  </ion-col>
+                  <ion-col style="justify-content: center;">
+                    <ion-button type="submit" size="medium" [disabled]="waterButtonDisabled" #submitWater>
+                      <ion-icon name="water-outline"></ion-icon>
+                      <ion-label>Water</ion-label>
+                    </ion-button>             
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </form>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>
-
-  <ion-card>
-    <ion-card-header>Water</ion-card-header>
-    <ion-card-content>
-      <form [formGroup]='wateringForm' (ngSubmit)='submitCmd()' novalidate >
-        <ion-grid>
-          <ion-row style="justify-content: left;">
-            <ion-col>
-              <ion-row style="justify-content: center;">
-                <ion-checkbox mode="ios" formControlName='plant1' #checkboxWater></ion-checkbox>
-              </ion-row>
-              <ion-row style="justify-content: center;">
-                <ion-label  style="font-size: 80%;">Plant 1</ion-label>
-              </ion-row>            
-            </ion-col>
-            <ion-col>
-              <ion-row style="justify-content: center;">
-                <ion-checkbox mode="ios" formControlName='plant2' #checkboxWater></ion-checkbox>
-              </ion-row>
-              <ion-row style="justify-content: center;">
-                <ion-label style="font-size: 80%;">Plant 2</ion-label>
-              </ion-row>
-            </ion-col>
-            <ion-col>
-              <ion-row style="justify-content: center;">
-                <ion-checkbox mode="ios" formControlName='plant3' #checkboxWater></ion-checkbox>
-              </ion-row>
-              <ion-row style="justify-content: center;">
-                <ion-label style="font-size: 80%;">Plant 3</ion-label>
-              </ion-row>
-            </ion-col>
-            <ion-col>
-              <ion-row style="justify-content: center;">
-                <ion-checkbox mode="ios" formControlName='plant4' #checkboxWater></ion-checkbox>
-              </ion-row>
-              <ion-row style="justify-content: center;">
-                <ion-label style="font-size: 80%;">Plant 4</ion-label>
-              </ion-row>
-            </ion-col>
-            <ion-col style="justify-content: center;">
-              <ion-button type="submit" size="medium" [disabled]="waterButtonDisabled" #submitWater>
-                <ion-icon name="water-outline"></ion-icon>
-                <ion-label>Water</ion-label>
-              </ion-button>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </form>
-    </ion-card-content>
-  </ion-card>
 <!--
 <ion-list>
     <ion-item *ngFor= "let data of dataList">

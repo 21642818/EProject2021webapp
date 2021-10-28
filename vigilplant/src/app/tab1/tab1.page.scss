@@ -9,6 +9,12 @@ ion-checkbox{
     background-color: rgb(28, 28, 29);
     border-color: rgb(28, 28, 29);
     border-style: none !important;
+    mode: 'md'
+}
+
+.button-date-range{
+  color: 'medium';
+  min-width: 15%;
 }
 
 $grid-breakpoints: (
@@ -22,10 +28,34 @@ $grid-max-widths: (
   lg: 960px
 );
 
-.button-active{
-    color: 'medium';
-    }
-    
-.button-standard{
-    color: 'primary';
+ion-range{
+  --pin: true;
+  --height: 1vh;
+}
+
+.range-1{
+  --bar-background: rgb(239, 71, 111,0.5);
+  --pin-background: rgb(239, 71, 111, 1);
+  --knob-background: rgb(239, 71, 111, 1);
+  --bar-background-active: rgb(239, 71, 111, 0.8);
+}
+.range-2{
+  --bar-background: rgb(255, 209, 102, 0.5);
+  --pin-background: rgb(255, 209, 102, 1);
+  --knob-background: rgb(255, 209, 102, 1);
+  --bar-background-active: rgb(255, 209, 102, 0.8);
+  --pin-color: rgb(0, 0, 0);
+}
+.range-3{
+  --bar-background: rgb(6, 214, 160, 0.5);
+  --pin-background: rgb(6, 214, 160, 1);
+  --knob-background: rgb(6, 214, 160, 1);
+  --bar-background-active: rgb(6, 214, 160, 0.8);
+  --pin-color: rgb(0, 0, 0);
+}
+.range-4{
+  --bar-background: rgb(17, 138, 178, 0.5);
+  --pin-background: rgb(17, 138, 178, 1);
+  --knob-background: rgb(17, 138, 178, 1);
+  --bar-background-active: rgb(17, 138, 178, 0.8);
 }
