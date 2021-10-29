@@ -1,19 +1,22 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { FirebaseService } from '../tabs/firebase.service';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-luxon';
-import cv from "../../assets/js/opencv.js"
+import { Observable } from 'rxjs';
+import { NgOpenCVService, OpenCVLoadResult } from 'ng-open-cv';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss']
 })
-export class Tab2Page {
+export class Tab2Page{
   @ViewChild("valueLineCanvas") valueLinesCanvas
   @ViewChild("valueLineCanvasTempHumid") valueTempHumid
-  @ViewChild("submitWater") submitWater
+  @ViewChild("variCanvas") variCanvas
+  variCxt: CanvasRenderingContext2D
+
   valueLinesChart: any;
   valueTempHumidChart: any;
   chartData = null;
@@ -25,12 +28,15 @@ export class Tab2Page {
 
   dataList: any [];
   imagePaths: any[];
-  imageRef: any;
+  imageLink: any;
   imageRefTimeStamp: any;
   firstDate: any;
   pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   defaultImg = '../assets/default-img.jpg'
+  openCVLoadResult: Observable<OpenCVLoadResult>;
+  imgHeight = 2464;
+  imgWidth = 3280;
 
   sliderOpts = {
     zoom: false,
@@ -39,11 +45,11 @@ export class Tab2Page {
     spaceBetween: 10,
   }
 
-  constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage) {
+  constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage, private ngOpenCVService: NgOpenCVService) {
     this.fetchData();
   }
 
-  ionViewDidLoad() {
+  ngOnInit() {
     this.fetchData()
   }
 
@@ -75,6 +81,75 @@ export class Tab2Page {
     this.updateCharts(this.dataList)
   }
 
+  showImg() {
+    this.openCVLoadResult = this.ngOpenCVService.isReady$;
+    if (this.variCanvas != undefined) {
+      this.openCVLoadResult = this.ngOpenCVService.isReady$;
+      let canvas = this.variCanvas.nativeElement;
+      if (this.variCxt != undefined) {
+        this.variCxt.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      const img = new Image();
+      img.crossOrigin = 'Anonymous'
+      this.variCxt = this.variCanvas.nativeElement.getContext("2d");
+      img.onload = () => {
+        canvas.height = this.imgHeight;
+        canvas.width = this.imgWidth;
+        this.variCxt.imageSmoothingEnabled = false;
+        this.variCxt.imageSmoothingQuality = "high"
+        this.variCxt.drawImage(img, 0, 0);
+        // this._runTest();
+      };
+      img.src = this.imageLink;
+    }
+  }
+
+  drawImg() {
+    //console.log(cmapVARI)
+    let canvas = this.variCanvas.nativeElement
+    let src = new cv.Mat()
+    src = cv.imread(canvas.id);
+    if (this.variCxt != undefined) {
+      this.variCxt.clearRect(0, 0, canvas.width, canvas.heigh);
+    }
+    let rgbaPlanes = new cv.MatVector();
+    cv.split(src, rgbaPlanes);
+    let red = rgbaPlanes.get(0);
+    let green = rgbaPlanes.get(1);
+    let blue = rgbaPlanes.get(2);
+    /*for (let row = 0; row < src.rows; row++) {
+      for (let col = 0; col < src.cols; col++) {
+        var pixel = src.ucharPtr(row, col);
+        //var newPixel = this.getIndexVARI(pixel[0],pixel[1],pixel[2])
+        red.ucharPtr(row, col)[0] = pixel[0]
+        green.ucharPtr(row, col)[0] = pixel[1]
+        blue.ucharPtr(row, col)[0] = pixel[2]
+      }
+    }*/
+    let dst1 = new cv.Mat();
+    let dst2 = new cv.Mat();
+    let dst3 = new cv.Mat();
+    let mask = new cv.Mat();
+    let dtype = -1;
+    cv.subtract(green, red, dst1, mask, dtype)
+    cv.add(green, red, dst2, mask, dtype)
+    cv.subtract(dst2, blue, dst3, mask, dtype)
+    dst1.mul(dst3, -1)
+    cv.bitwise_not(dst1,dst3)
+    cv.imshow('vari', dst3);
+    src.delete(); red.delete(); green.delete(); blue.delete(); rgbaPlanes.delete()
+    dst1.delete(); dst2.delete(); dst3.delete(); mask.delete();
+    console.log('finished')
+  }
+
+  getIndexVARI(red: number, green: number, blue: number){
+    if ((green+red) == blue) {
+      return (green-red)/(green+red-blue+1)
+    } else {
+      return (green-red)/(green+red-blue)
+    }
+  }
+
   fetchData() {
     let calibrationRes = this.firebaseApi.getCalibration();
     calibrationRes.snapshotChanges().subscribe(res => {
@@ -85,7 +160,7 @@ export class Tab2Page {
     var lastImagePath: any;
     var lastImageStamp: any;
     let dataRes = this.firebaseApi.getDataList();
-    dataRes.snapshotChanges().subscribe(res => {
+    dataRes.snapshotChanges().subscribe(async res => {
       let datestampArray = [];
       let resArray = [];
       let tList = [];
@@ -131,15 +206,13 @@ export class Tab2Page {
         this.createCharts(resArray)
       }
       this.dataList = resArray;
-      this.imageRef = this.fbStorage.ref("/"+lastImagePath).getDownloadURL();
+      let imageRef = this.fbStorage.ref("/" + lastImagePath).getDownloadURL()
+      imageRef.forEach((val) =>{
+        this.imageLink = val
+        //console.log(this.imageLink)
+      })
       this.imageRefTimeStamp = new Date(lastImageStamp).toLocaleString('en-ZA');
     });    
-  }
-
-  chartHidden(){
-    if (this.valueLinesChart != undefined){
-      //console.log(!this.valueLinesChart.data.datasets[4].hidden)
-    }
   }
 
   getReportValue(num){

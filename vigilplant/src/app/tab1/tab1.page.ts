@@ -1,5 +1,6 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { FirebaseService } from '../tabs/firebase.service';
+import { ViewDidEnter } from '@ionic/angular';
 import Chart from 'chart.js/auto';
 import 'chartjs-adapter-luxon';
 import annotationPlugin from 'chartjs-plugin-annotation';
@@ -11,7 +12,7 @@ import { AlertController } from '@ionic/angular';
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss']
 })
-export class Tab1Page{
+export class Tab1Page {
   public wateringForm: FormGroup; 
   public triggerForm: FormGroup;  
   public waterButtonDisabled : boolean;
@@ -43,11 +44,6 @@ export class Tab1Page{
     this.fetchData();
     this.waterForm();
     this.trigForm();
-  }
-
-  ngOnInit() {
-    //Chart.register(annotationPlugin);
-    this.fetchData();
   }
 
   waterForm(){

@@ -20,6 +20,14 @@ import { FirebaseService } from './tabs/firebase.service';
 /* Reactive Forms */
 import { ReactiveFormsModule } from '@angular/forms';
 
+/* OpenCV*/
+import { NgOpenCVModule, OpenCVOptions } from 'ng-open-cv';
+
+const openCVConfig: OpenCVOptions = {
+  scriptUrl: 'assets/opencv/asm/3.4/opencv.js',
+  usingWasm: false,
+  onRuntimeInitialized: () => {}
+}
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -28,7 +36,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     AngularFireModule.initializeApp(environment.firebase, 'vigilplant'),
     AngularFireDatabaseModule,
     AngularFireStorageModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgOpenCVModule.forRoot(openCVConfig),
   ],
   providers: [FirebaseService, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

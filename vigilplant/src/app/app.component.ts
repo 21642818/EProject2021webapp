@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-declare var cv;
+
 
 @Component({
   selector: 'app-root',

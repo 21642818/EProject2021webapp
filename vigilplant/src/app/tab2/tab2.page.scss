@@ -1,11 +1,32 @@
 div.img img {
     border-radius: 2%;
     display: inline;
-    height: 40vh;
+    height: 70vh;
     width: auto;
     margin: auto;
     object-fit : contain ;
     align-items: center;
+    display: block;
+}
+
+.canvas-container{
+    border-radius: 0%;
+    display: inline;
+    margin: auto;
+    align-items: center;
+    display: block;
+}
+
+.vari-canvas{
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: crisp-edges;
+    image-rendering: optimizeQuality;
+    image-resolution: 1;
+    height: 70vh;
+    width: auto;
+    display: inline;
+    object-fit : contain ;
     display: block;
 }
 
