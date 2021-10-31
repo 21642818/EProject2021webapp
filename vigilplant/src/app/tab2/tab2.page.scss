@@ -1,18 +1,15 @@
 div.img img {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: crisp-edges;
+    image-rendering: optimizeQuality;
+    image-resolution: 1;
     border-radius: 2%;
     display: inline;
-    height: 70vh;
+    height: auto;
     width: auto;
     margin: auto;
     object-fit : contain ;
-    align-items: center;
-    display: block;
-}
-
-.canvas-container{
-    border-radius: 0%;
-    display: inline;
-    margin: auto;
     align-items: center;
     display: block;
 }
@@ -23,8 +20,9 @@ div.img img {
     image-rendering: crisp-edges;
     image-rendering: optimizeQuality;
     image-resolution: 1;
-    height: 70vh;
-    width: auto;
+    border-radius: 2%;
+    height: auto;
+    width: 100%;
     display: inline;
     object-fit : contain ;
     display: block;

@@ -140,12 +140,21 @@ export class Tab1Page {
   oneMonth(){
     this.setDate(30);
   }
+  
+  maxTime(){
+    this.setDate(-1);
+  }
 
   setDate(daterange: number) {
-    this.pastDate = new Date(Date.now() - daterange * 24 * 60 * 60 * 1000)
-    if (this.pastDate < this.firstDate) {
+    if (daterange > 0) {
+      this.pastDate = new Date(Date.now() - daterange * 24 * 60 * 60 * 1000)
+      if (this.pastDate < this.firstDate) {
+        this.pastDate = this.firstDate
+      }
+    } else {
       this.pastDate = this.firstDate
     }
+
     this.updateCharts(this.chartData)
   }
 

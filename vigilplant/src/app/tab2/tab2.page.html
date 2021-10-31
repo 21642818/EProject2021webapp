@@ -39,13 +39,18 @@
           </ion-button>
         </ion-col>
         <ion-col>
-          <ion-button class='button-date-range' (click)='oneWeek()'>
-            <ion-label>1W</ion-label>
+          <ion-button class='button-date-range' (click)='twoWeeks()'>
+            <ion-label>2W</ion-label>
           </ion-button>
         </ion-col>
         <ion-col>
           <ion-button class='button-date-range' (click)='oneMonth()'>
             <ion-label>1M</ion-label>
+          </ion-button>
+        </ion-col>
+        <ion-col>
+          <ion-button class='button-date-range' (click)='maxTime()'>
+            <ion-label>MAX</ion-label>
           </ion-button>
         </ion-col>
       </ion-grid>
@@ -55,34 +60,43 @@
   <ion-grid class='ion-no-padding' >
     <ion-row>
       <ion-col style="justify-content: center;" class='ion-no-padding' size-lg=6 size-md=12 size-sm=12 size-xs=12>
-        <ion-card>
+        <ion-card style="height: min-content;">
           <ion-card-header>Image - {{imageRefTimeStamp}}</ion-card-header>
           <ion-card-content style='justify-content: center; text-align: center;'>
             <!--<div class="img" *ngIf="imageLink | async; let url">
               <img class="img" [src]="url" alt="Image from AngularFireStorage">
             </div>-->
             <div class="img"> 
-              <img class="img" [src]="imageLink" alt="Image from AngularFireStorage">
+              <img class="img" [src]="imageLink" alt="Image from AngularFireStorage" #imgStatic>
             </div>
-            <ion-button (click)='takePicture()'>
-              <ion-icon name="camera-outline"></ion-icon>
-              <ion-label>Update Picture</ion-label>
+            <div class="img"> 
+              <img class="img" [src]="defaultImg" alt="Image from AngularFireStorage" hidden="true" #imgTimeLapse>
+            </div>
+            <ion-button size='small' (click)='createTimelapse()'>
+              <ion-icon name="stopwatch-outline"></ion-icon>
+              <ion-label>Create Timelapse</ion-label>
+            </ion-button>
+            <ion-button size='small' (click)='startSlideshow()' [disabled]='playButtonDisabled'>
+              <ion-icon name="play-outline"></ion-icon>
+              <ion-label>Play Timelapse</ion-label>
             </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
       <ion-col style="justify-content: center;" class='ion-no-padding' size-lg=6 size-md=12 size-sm=12 size-xs=12>
         <ion-card>
-          <ion-card-header>VARI</ion-card-header>
+          <ion-card-header #progress>
+            VARI <ion-progress-bar [value]="imgProcProgress" *ngIf='variProgressFlag'></ion-progress-bar>
+          </ion-card-header>
           <ion-card-content style='justify-content: center; text-align: center;'>
               <div class="canvas-container">
                 <canvas id='vari' class="vari-canvas" #variCanvas></canvas>
               </div>
-              <ion-button (click)='showImg()'>
-                <ion-icon name="camera-reverse-outline"></ion-icon>
+              <ion-button size='small' (click)='showImg()'>
+                <ion-icon name="sync-outline"></ion-icon>
                 <ion-label>Refresh Image</ion-label>
               </ion-button>
-              <ion-button (click)='drawImg()'>
+              <ion-button size='small' (click)='drawImg()'>
                 <ion-icon name="color-palette-outline"></ion-icon>
                 <ion-label>Create VARI</ion-label>
               </ion-button>
