@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "eproject2021-555cc": {
+      "hosting": {
+        "app": [
+          "eproject2021-555cc"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "eproject2021-555cc"
+  }
+}

@@ -54,7 +54,8 @@ export class Tab2Page{
     spaceBetween: 10,
   }
 
-  constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage, private ngOpenCVService: NgOpenCVService, private alertController: AlertController) {
+  constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage, 
+      private ngOpenCVService: NgOpenCVService, private alertController: AlertController) {
     this.fetchData();
     this.playButtonDisabled = true
   }

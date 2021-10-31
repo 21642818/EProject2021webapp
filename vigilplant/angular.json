@@ -29,9 +29,13 @@
                 "glob": "**/*.svg",
                 "input": "node_modules/ionicons/dist/ionicons/svg",
                 "output": "./svg"
-              }
+              },
+              "src/manifest.webmanifest"
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss"],
+            "styles": [
+              "src/theme/variables.scss",
+              "src/global.scss"
+            ],
             "scripts": [],
             "aot": false,
             "vendorChunk": true,
@@ -39,7 +43,9 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json"
           },
           "configurations": {
             "production": {
@@ -109,7 +115,8 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "/assets"
-              }
+              },
+              "src/manifest.webmanifest"
             ]
           },
           "configurations": {
@@ -165,6 +172,16 @@
               "cordovaBuildTarget": "app:ionic-cordova-build:production",
               "devServerTarget": "app:serve:production"
             }
+          }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "app:build:production",
+            "firebaseProject": "eproject2021-555cc",
+            "firebaseHostingSite": "eproject2021-555cc"
           }
         }
       }

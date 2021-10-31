@@ -22,6 +22,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 /* OpenCV*/
 import { NgOpenCVModule, OpenCVOptions } from 'ng-open-cv';
+import { provideAuth,getAuth } from '@angular/fire/auth';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 const openCVConfig: OpenCVOptions = {
   scriptUrl: 'assets/opencv/asm/3.4/opencv.js',
@@ -38,6 +40,13 @@ const openCVConfig: OpenCVOptions = {
     AngularFireStorageModule,
     ReactiveFormsModule,
     NgOpenCVModule.forRoot(openCVConfig),
+    provideAuth(() => getAuth()),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      // Register the ServiceWorker as soon as the app is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [FirebaseService, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
