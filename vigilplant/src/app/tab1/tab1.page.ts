@@ -12,7 +12,7 @@ import { AlertController } from '@ionic/angular';
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss']
 })
-export class Tab1Page {
+export class Tab1Page implements ViewDidEnter{
   public wateringForm: FormGroup; 
   public triggerForm: FormGroup;  
   public waterButtonDisabled : boolean;
@@ -40,6 +40,13 @@ export class Tab1Page {
   pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   constructor(private firebaseApi: FirebaseService, public fb: FormBuilder, private alertController: AlertController) {
+    Chart.register(annotationPlugin);
+    this.fetchData();
+    this.waterForm();
+    this.trigForm();
+  }
+
+  ionViewDidEnter(): void {
     Chart.register(annotationPlugin);
     this.fetchData();
     this.waterForm();

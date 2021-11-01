@@ -6,14 +6,14 @@ import 'chartjs-adapter-luxon';
 import { Observable } from 'rxjs';
 import { NgOpenCVService, OpenCVLoadResult } from 'ng-open-cv';
 import * as colormap from 'colormap'
-import { AlertController } from '@ionic/angular';
+import { AlertController, ViewDidEnter } from '@ionic/angular';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
 })
-export class Tab2Page{
+export class Tab2Page implements ViewDidEnter{
   @ViewChild("valueLineCanvas") valueLinesCanvas
   @ViewChild("valueLineCanvasTempHumid") valueTempHumid
   @ViewChild("imgStatic") imgStatic
@@ -60,8 +60,9 @@ export class Tab2Page{
     this.playButtonDisabled = true
   }
 
-  ngOnInit() {
-    this.fetchData()
+  ionViewDidEnter(): void {
+    this.fetchData();
+    this.playButtonDisabled = true
   }
 
   oneDay(){
@@ -370,8 +371,8 @@ export class Tab2Page{
       }
       let lastImgPath = newImagePath
       let imageRef = this.fbStorage.ref("/" + lastImgPath).getDownloadURL()
-      imageRef.forEach((val) =>{
-        this.imageLink = val
+      imageRef.forEach(async (val) =>{
+        this.imageLink = await this.getBase64ImageFromUrl(val)
         //console.log(this.imageLink)
         this.showImg()
       })
