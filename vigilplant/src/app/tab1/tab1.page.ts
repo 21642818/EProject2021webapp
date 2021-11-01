@@ -40,6 +40,7 @@ export class Tab1Page implements ViewDidEnter{
   pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   prefersDark = false;
+  waterLevelFlag: boolean;
 
   constructor(private firebaseApi: FirebaseService, public fb: FormBuilder, private alertController: AlertController) {
     Chart.register(annotationPlugin);
@@ -103,22 +104,26 @@ export class Tab1Page implements ViewDidEnter{
   }
 
   submitCmd() {
-    this.waterButtonDisabled = true;
-    let wateringArr = [];
-    let wateringDict = this.wateringForm.value
-    Object.keys(wateringDict).map(function(val){
-      if (wateringDict[val]) {
-        wateringArr.push(1)
-      } else {
-        wateringArr.push(0)
-      }
-    })
-    this.firebaseApi.addCmd(wateringArr)
-    this.waterAlert()
-    this.resetForm()
-    setTimeout(() => {
-      this.waterButtonDisabled = false;
-    }, 30000)
+    if (this.waterLevelFlag) {
+      this.waterLevelAlert()
+    } else {
+      this.waterButtonDisabled = true;
+      let wateringArr = [];
+      let wateringDict = this.wateringForm.value
+      Object.keys(wateringDict).map(function(val){
+        if (wateringDict[val]) {
+          wateringArr.push(1)
+        } else {
+          wateringArr.push(0)
+        }
+      })
+      this.firebaseApi.addCmd(wateringArr)
+      this.waterAlert()
+      this.resetForm()
+      setTimeout(() => {
+        this.waterButtonDisabled = false;
+      }, 30000)
+    }
   }
 
   submitTrig(){
@@ -203,6 +208,21 @@ export class Tab1Page implements ViewDidEnter{
     console.log('onDidDismiss resolved with role', role);
   }
 
+  async waterLevelAlert() {
+    const alert = await this.alertController.create({
+      //cssClass: '',
+      header: 'Warning',
+      //subHeader: 'Subtitle',
+      message: 'Water Level is too low! Please fill up reservoir',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
+  }
+
   fetchData() {
     let calibrationRes = this.firebaseApi.getCalibration();
     calibrationRes.snapshotChanges().subscribe(res => {
@@ -239,6 +259,7 @@ export class Tab1Page implements ViewDidEnter{
         Object.keys(val).map((k) => {
           //resArray.push(val[k]);
           let timestamp = val[k]["date"]+"T"+val[k]["timestamp"]
+          let waterLevelFlag = val[k]["float_switch"]
           let soilArr = val[k]["soil_moisture"];
           for (let index = 0; index < soilArr.length; index++) {
             let value = soilArr[index];
@@ -250,16 +271,20 @@ export class Tab1Page implements ViewDidEnter{
             };
             soilArr[index] = newValue;
           }
-          resArray.push(new lineDataSet(timestamp,soilArr));
+          resArray.push(new lineDataSet(timestamp,soilArr,waterLevelFlag));
           return resArray;
         });
       });
       this.dataList = resArray;
       this.firstDate = resArray[0].timestamp
+      this.waterLevelFlag = resArray[resArray.length-1].waterLevelFlag
       if (this.chartData) {
         this.updateCharts(resArray)
       } else {
         this.createCharts(resArray)
+      }
+      if (this.waterLevelFlag) {
+        this.waterLevelAlert()
       }
     });    
   }
@@ -269,7 +294,7 @@ export class Tab1Page implements ViewDidEnter{
     
     for (let trans of this.chartData) {
       //console.log(trans)
-      reportValue.push(trans.soil_moisture[num])
+      reportValue.push(trans.soilMoisture[num])
     }
     
     return reportValue
@@ -528,11 +553,13 @@ export class Tab1Page implements ViewDidEnter{
 }
 export class lineDataSet {
   timestamp: Date;
-  soil_moisture: Number [];
+  soilMoisture: Number [];
+  waterLevelFlag: boolean;
 
-  constructor( timestamp, soil_moisture) {
+  constructor( timestamp, soilMoisture, waterLevelFlag) {
     this.timestamp = new Date(Date.parse(timestamp));
-    this.soil_moisture = soil_moisture;
+    this.soilMoisture = soilMoisture;
+    this.waterLevelFlag = waterLevelFlag
   }
 }
 
