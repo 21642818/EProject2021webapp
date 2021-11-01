@@ -39,11 +39,18 @@ export class Tab1Page implements ViewDidEnter{
   firstDate: any;
   pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
+  prefersDark = false;
+
   constructor(private firebaseApi: FirebaseService, public fb: FormBuilder, private alertController: AlertController) {
     Chart.register(annotationPlugin);
     this.fetchData();
     this.waterForm();
     this.trigForm();
+  }
+
+  toggleTheme() {
+    this.prefersDark = !this.prefersDark;
+    document.body.classList.toggle('dark', this.prefersDark);
   }
 
   ionViewDidEnter(): void {
@@ -107,6 +114,7 @@ export class Tab1Page implements ViewDidEnter{
       }
     })
     this.firebaseApi.addCmd(wateringArr)
+    this.waterAlert()
     this.resetForm()
     setTimeout(() => {
       this.waterButtonDisabled = false;
@@ -171,6 +179,21 @@ export class Tab1Page implements ViewDidEnter{
       header: 'Success',
       //subHeader: 'Subtitle',
       message: 'Triggers have been updated',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
+  }
+
+  async waterAlert() {
+    const alert = await this.alertController.create({
+      //cssClass: '',
+      header: 'Success',
+      //subHeader: 'Subtitle',
+      message: 'Plants have been watered',
       buttons: ['OK']
     });
 

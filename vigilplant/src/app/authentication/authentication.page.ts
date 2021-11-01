@@ -52,7 +52,7 @@ export class AuthenticationPage implements OnInit {
       // This will give you an error since we don't have the / URL in our routes yet.
       this.router.navigateByUrl('tabs');
     } catch (error) {
-      this.presentAlert()
+      this.loginAlert()
       console.log('Either we couldn`t find your user or there was a problem with the password');
     }
   }
@@ -60,8 +60,10 @@ export class AuthenticationPage implements OnInit {
     // This will hold the logic for the signup function.
     try {
       await this.auth.signup(email, password);
-      this.router.navigateByUrl('login');
+      this.signupOkAlert()
+      //this.router.navigateByUrl('login');
     } catch (error) {
+      this.signupAlert()
       console.log(error);
     };
   }
@@ -70,13 +72,14 @@ export class AuthenticationPage implements OnInit {
     try {
       await this.auth.resetPassword(email);
       console.log('Email Sent');
-      this.router.navigateByUrl('login')
+      this.resetOKAlert()
     } catch (error) {
+      this.resetAlert()
       console.log('Error: ', error)
     }
   }
 
-  async presentAlert() {
+  async loginAlert() {
     const alert = await this.alertController.create({
       //cssClass: 'my-custom-class',
       header: 'Alert',
@@ -89,5 +92,69 @@ export class AuthenticationPage implements OnInit {
 
     const { role } = await alert.onDidDismiss();
     console.log('onDidDismiss resolved with role', role);
+  }
+
+  async resetAlert() {
+    const alert = await this.alertController.create({
+      //cssClass: 'my-custom-class',
+      header: 'Alert',
+      subHeader: 'Password Reset Error',
+      message: 'It seems that this account doesn`t exists. Try creating an account.',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
+    this.router.navigateByUrl('login')
+  }
+
+  async signupAlert() {
+    const alert = await this.alertController.create({
+      //cssClass: 'my-custom-class',
+      header: 'Alert',
+      subHeader: 'Signup Error',
+      message: 'It seems that this account already exists. Try resetting your password.',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
+    this.router.navigateByUrl('login')
+  }
+
+  async resetOKAlert() {
+    const alert = await this.alertController.create({
+      //cssClass: 'my-custom-class',
+      header: 'Success',
+      subHeader: 'Password Reset',
+      message: 'Email sent with password reset link.',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
+    this.router.navigateByUrl('login')
+  }
+
+  async signupOkAlert() {
+    const alert = await this.alertController.create({
+      //cssClass: 'my-custom-class',
+      header: 'Success',
+      subHeader: 'Signup',
+      message: 'Signup was successful, Returning to the login page.',
+      buttons: ['OK']
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
+    this.router.navigateByUrl('login')
   }
 }

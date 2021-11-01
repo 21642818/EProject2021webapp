@@ -7,6 +7,8 @@ import { ExploreContainerComponentModule } from '../explore-container/explore-co
 
 import { Tab2PageRoutingModule } from './tab2-routing.module';
 
+import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
+
 
 @NgModule({
   imports: [
@@ -14,7 +16,8 @@ import { Tab2PageRoutingModule } from './tab2-routing.module';
     CommonModule,
     FormsModule,
     ExploreContainerComponentModule,
-    Tab2PageRoutingModule
+    Tab2PageRoutingModule,
+    NgxIonicImageViewerModule
   ],
   declarations: [Tab2Page]
 })

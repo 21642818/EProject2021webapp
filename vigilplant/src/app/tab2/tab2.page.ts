@@ -17,9 +17,9 @@ export class Tab2Page implements ViewDidEnter{
   @ViewChild("valueLineCanvas") valueLinesCanvas
   @ViewChild("valueLineCanvasTempHumid") valueTempHumid
   @ViewChild("imgStatic") imgStatic
+  @ViewChild("imgStaticDiv") imgStaticDiv
   @ViewChild("imgTimeLapse") imgTimeLapse
   @ViewChild("variCanvas") variCanvas
-  @ViewChild("progress") progressLabel
   variCxt: CanvasRenderingContext2D
 
   valueLinesChart: any;
@@ -40,19 +40,11 @@ export class Tab2Page implements ViewDidEnter{
 
   defaultImg = '../assets/default-img.jpg'
   openCVLoadResult: Observable<OpenCVLoadResult>;
-  imgProcProgress = 0;
   imgHeight = 2464;
   imgWidth = 3280;
   imgCollection: any [];
   public playButtonDisabled : boolean = true;
-  
-
-  sliderOpts = {
-    zoom: false,
-    slidesPerView: 1.1,
-    centredSlides: true,
-    spaceBetween: 10,
-  }
+  public createVARIButtonDisabled : boolean = false;
 
   constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage, 
       private ngOpenCVService: NgOpenCVService, private alertController: AlertController) {
@@ -100,12 +92,6 @@ export class Tab2Page implements ViewDidEnter{
     }
 
     this.updateCharts(this.chartData)
-  }
-
-  takePicture() {
-    this.imgTimeLapse.nativeElement.hidden=true
-    this.imgStatic.nativeElement.hidden=false
-    console.log('click')
   }
 
   async createTimelapse(){
@@ -157,7 +143,7 @@ export class Tab2Page implements ViewDidEnter{
 
   startSlideshow(){
     let temp = this.imageRefTimeStamp
-    this.imgStatic.nativeElement.hidden=true
+    this.imgStaticDiv.nativeElement.hidden=true
     this.imgTimeLapse.nativeElement.hidden=false
     this.updateSlideshow(this.imgCollection)
     this.imageRefTimeStamp = temp
@@ -175,7 +161,7 @@ export class Tab2Page implements ViewDidEnter{
     } else {
       console.log('finished')
       this.imgTimeLapse.nativeElement.hidden=true
-      this.imgStatic.nativeElement.hidden=false
+      this.imgStaticDiv.nativeElement.hidden=false
       this.slideshowFinished()
       this.playButtonDisabled = true
     }
@@ -227,7 +213,7 @@ export class Tab2Page implements ViewDidEnter{
   }
 
   showImg() {
-    this.imgProcProgress = 0;
+    this.createVARIButtonDisabled = false
     this.openCVLoadResult = this.ngOpenCVService.isReady$;
     if (this.variCanvas != undefined) {
       this.openCVLoadResult = this.ngOpenCVService.isReady$;
@@ -249,66 +235,68 @@ export class Tab2Page implements ViewDidEnter{
     }
   }
 
-  drawImg() {
-    this.imgProcProgress = 0;
-    let canvas = this.variCanvas.nativeElement
-    let src = new cv.Mat()
-    src = cv.imread(canvas.id);
-    if (this.variCxt != undefined) {
-      this.variCxt.clearRect(0, 0, canvas.width, canvas.heigh);
-    }
-    let rgbaPlanes = new cv.MatVector();
-    cv.split(src, rgbaPlanes);
-    let red = rgbaPlanes.get(0);
-    let green = rgbaPlanes.get(1);
-    let blue = rgbaPlanes.get(2);
-    rgbaPlanes.delete();
-    
-    let dst1 = new cv.Mat();
-    let dst2 = new cv.Mat();
-    let dst3 = new cv.Mat();
-    let mask = new cv.Mat();
-    let dtype = -1;
-    cv.subtract(green, red, dst1, mask, dtype)
-    cv.add(green, red, dst2, mask, dtype)
-    cv.subtract(dst2, blue, dst3, mask, dtype)
-    red.delete(); green.delete(); blue.delete(); dst2.delete(); mask.delete(); 
-    dst1.mul(dst3, -1);
-    dst3.delete();
-    let minMax = cv.minMaxLoc(dst1)
-    cv.cvtColor(dst1, dst1, cv.COLOR_GRAY2RGBA, 0)
-    let variCustomCmap = [
-      {
-        index: 0,
-        rgb: [0, 0, 255]
-      },
-      {
-        index: 1,
-        rgb: [0, 255, 0]
+  async drawImg() {
+    this.createVARIButtonDisabled = true
+    new Promise(resolve => setTimeout(resolve, 500)).then(()=>{
+      let canvas = this.variCanvas.nativeElement
+      let src = new cv.Mat()
+      src = cv.imread(canvas.id);
+      if (this.variCxt != undefined) {
+        this.variCxt.clearRect(0, 0, canvas.width, canvas.heigh);
       }
-    ]
-    let cmapVARI = colormap({
-      colormap: "cool",
-      nshades: minMax.maxVal+1,
-      format: 'rba',
-      alpha: [255, 255]
-    })
-    let colour = new cv.Mat(dst1.rows, dst1.cols, cv.CV_8UC4, new cv.Scalar(0,0,0))
-    for (let row = 0; row < dst1.rows; row++) {
-      for (let col = 0; col < dst1.cols; col++) {
-        var pixel = dst1.ucharPtr(row, col)[0];
-        var newPixel = cmapVARI[pixel]
-        colour.ucharPtr(row, col)[0] = newPixel[0]
-        colour.ucharPtr(row, col)[1] = newPixel[1]
-        colour.ucharPtr(row, col)[2] = newPixel[2]
-        colour.ucharPtr(row, col)[3] = 255       
+      let rgbaPlanes = new cv.MatVector();
+      cv.split(src, rgbaPlanes);
+      let red = rgbaPlanes.get(0);
+      let green = rgbaPlanes.get(1);
+      let blue = rgbaPlanes.get(2);
+      rgbaPlanes.delete();
+      
+      let dst1 = new cv.Mat();
+      let dst2 = new cv.Mat();
+      let dst3 = new cv.Mat();
+      let mask = new cv.Mat();
+      let dtype = -1;
+      cv.subtract(green, red, dst1, mask, dtype)
+      cv.add(green, red, dst2, mask, dtype)
+      cv.subtract(dst2, blue, dst3, mask, dtype)
+      red.delete(); green.delete(); blue.delete(); dst2.delete(); mask.delete(); 
+      dst1.mul(dst3, -1);
+      dst3.delete();
+      let minMax = cv.minMaxLoc(dst1)
+      cv.cvtColor(dst1, dst1, cv.COLOR_GRAY2RGBA, 0)
+      let variCustomCmap = [
+        {
+          index: 0,
+          rgb: [0, 0, 255]
+        },
+        {
+          index: 1,
+          rgb: [0, 255, 0]
+        }
+      ]
+      let cmapVARI = colormap({
+        colormap: "cool",
+        nshades: minMax.maxVal+1,
+        format: 'rba',
+        alpha: [255, 255]
+      })
+      let colour = new cv.Mat(dst1.rows, dst1.cols, cv.CV_8UC4, new cv.Scalar(0,0,0))
+      for (let row = 0; row < dst1.rows; row++) {
+        for (let col = 0; col < dst1.cols; col++) {
+          var pixel = dst1.ucharPtr(row, col)[0];
+          var newPixel = cmapVARI[pixel]
+          colour.ucharPtr(row, col)[0] = newPixel[0]
+          colour.ucharPtr(row, col)[1] = newPixel[1]
+          colour.ucharPtr(row, col)[2] = newPixel[2]
+          colour.ucharPtr(row, col)[3] = 255       
+        }
       }
-      this.imgProcProgress = Math.ceil((row/dst1.rows)*100);
-    }
-    cv.imshow('vari', colour);
-    src.delete(); colour.delete(); dst1.delete();
-    this.variFinished()
-    console.log('finished')
+      cv.imshow('vari', colour);
+      src.delete(); colour.delete(); dst1.delete();  
+      this.variFinished()
+      this.createVARIButtonDisabled = false
+      console.log('finished')    
+    });
   }
 
   getIndexVARI(red: number, green: number, blue: number){

@@ -22,6 +22,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 /* OpenCV*/
 import { NgOpenCVModule, OpenCVOptions } from 'ng-open-cv';
+
+/* Imgae Viewer */
+import { NgxIonicImageViewerModule } from 'ngx-ionic-image-viewer';
+
 import { provideAuth,getAuth } from '@angular/fire/auth';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -39,6 +43,7 @@ const openCVConfig: OpenCVOptions = {
     AngularFireDatabaseModule,
     AngularFireStorageModule,
     ReactiveFormsModule,
+    NgxIonicImageViewerModule,
     NgOpenCVModule.forRoot(openCVConfig),
     provideAuth(() => getAuth()),
     ServiceWorkerModule.register('ngsw-worker.js', {

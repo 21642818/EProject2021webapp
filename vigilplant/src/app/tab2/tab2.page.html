@@ -66,8 +66,9 @@
             <!--<div class="img" *ngIf="imageLink | async; let url">
               <img class="img" [src]="url" alt="Image from AngularFireStorage">
             </div>-->
-            <div class="img"> 
-              <img class="img" [src]="imageLink" alt="Image from AngularFireStorage" #imgStatic>
+            <div class="img" #imgStaticDiv> 
+              <!--<img class="img" [src]="imageLink" alt="Image from AngularFireStorage" #imgStatic>-->
+              <ion-img-viewer title="Recent Plant Image - {{imageRefTimeStamp}}" alt="Image from AngularFireStorage" text="Most Recent Plant Image from AngularFireStorage" [src]="imageLink" scheme="auto" cssClass="img" #imgStatic></ion-img-viewer>
             </div>
             <div class="img"> 
               <img class="img" [src]="defaultImg" alt="Image from AngularFireStorage" hidden="true" #imgTimeLapse>
@@ -96,7 +97,7 @@
                 <ion-icon name="sync-outline"></ion-icon>
                 <ion-label>Refresh Image</ion-label>
               </ion-button>
-              <ion-button size='small' (click)='drawImg()'>
+              <ion-button size='small' (click)='drawImg()' [disabled]='createVARIButtonDisabled'>
                 <ion-icon name="color-palette-outline"></ion-icon>
                 <ion-label>Create VARI</ion-label>
               </ion-button>
