@@ -30,6 +30,11 @@ export class FirebaseService {
     return this.triggersListRef
   }
 
+  getFlag(){
+    this.triggersListRef = this.db.list('flag')
+    return this.triggersListRef
+  }
+
   getData(id:string) {
     this.dataRef = this.db.object('data/'+id);
     return this.dataRef

@@ -37,6 +37,7 @@ export class Tab2Page implements ViewDidEnter{
   imageRefTimeStamp: any;
   firstDate: any;
   pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  dateRangeString = '7 Day';
 
   defaultImg = '../assets/default-img.jpg'
   openCVLoadResult: Observable<OpenCVLoadResult>;
@@ -44,41 +45,52 @@ export class Tab2Page implements ViewDidEnter{
   imgWidth = 3280;
   imgCollection: any [];
   public playButtonDisabled : boolean = true;
+  public createButtonDisabled : boolean = false;
   public createVARIButtonDisabled : boolean = false;
+  creatingTimelapse: boolean = false;
+  creatingVARICmap: boolean = false;
 
   constructor(private firebaseApi: FirebaseService, private fbStorage: AngularFireStorage, 
       private ngOpenCVService: NgOpenCVService, private alertController: AlertController) {
     this.fetchData();
     this.playButtonDisabled = true
+    this.createButtonDisabled = false
   }
 
   ionViewDidEnter(): void {
     this.fetchData();
     this.playButtonDisabled = true
+    this.createButtonDisabled = false
   }
 
   oneDay(){
     this.setDate(1);
+    this.dateRangeString = '1 Day'
   }
 
   fiveDays(){
     this.setDate(5);
+    this.dateRangeString = '5 Day'
   }
 
   sevenDays(){
     this.setDate(7);
+    this.dateRangeString = '7 Day'
   }
 
   twoWeeks(){
     this.setDate(14);
+    this.dateRangeString = '2 week'
   }
 
   oneMonth(){
     this.setDate(30);
+    this.dateRangeString = '1 month'
   }
 
   maxTime(){
     this.setDate(-1);
+    this.dateRangeString = 'max range'
   }
 
   setDate(daterange: number) {
@@ -95,6 +107,8 @@ export class Tab2Page implements ViewDidEnter{
   }
 
   async createTimelapse(){
+    this.creatingTimelapse= true;
+    this.createButtonDisabled = true;
     console.log('timelapse')
     let imgCollection = []
     for (let trans of this.chartData.reverse()) {
@@ -121,6 +135,7 @@ export class Tab2Page implements ViewDidEnter{
     //var plantCollection = ee.ImageCollection(imgCollection)
     this.timelapseCreatedAlert()
     this.playButtonDisabled = false
+    this.creatingTimelapse= false;
     //console.log(this.imgStatic.nativeElement.hidden)
   }
 
@@ -135,6 +150,7 @@ export class Tab2Page implements ViewDidEnter{
        }, false);
  
        reader.onerror = () => {
+        this.creatingTimelapse= false;
           return reject(this);
        };
        reader.readAsDataURL(blob);
@@ -145,6 +161,7 @@ export class Tab2Page implements ViewDidEnter{
     let temp = this.imageRefTimeStamp
     this.imgStaticDiv.nativeElement.hidden=true
     this.imgTimeLapse.nativeElement.hidden=false
+    this.playButtonDisabled = true
     this.updateSlideshow(this.imgCollection)
     this.imageRefTimeStamp = temp
   }
@@ -163,7 +180,7 @@ export class Tab2Page implements ViewDidEnter{
       this.imgTimeLapse.nativeElement.hidden=true
       this.imgStaticDiv.nativeElement.hidden=false
       this.slideshowFinished()
-      this.playButtonDisabled = true
+      this.createButtonDisabled = false
     }
   }
 
@@ -212,11 +229,9 @@ export class Tab2Page implements ViewDidEnter{
     console.log('onDidDismiss resolved with role', role);
   }
 
-  showImg() {
-    this.createVARIButtonDisabled = false
+  async showImg() {
     this.openCVLoadResult = this.ngOpenCVService.isReady$;
     if (this.variCanvas != undefined) {
-      this.openCVLoadResult = this.ngOpenCVService.isReady$;
       let canvas = this.variCanvas.nativeElement;
       if (this.variCxt != undefined) {
         this.variCxt.clearRect(0, 0, canvas.width, canvas.height);
@@ -224,66 +239,72 @@ export class Tab2Page implements ViewDidEnter{
       const img = new Image();
       img.crossOrigin = 'Anonymous'
       this.variCxt = this.variCanvas.nativeElement.getContext("2d");
+      img.src = this.imageLink;
       img.onload = () => {
         canvas.height = this.imgHeight;
         canvas.width = this.imgWidth;
         this.variCxt.imageSmoothingEnabled = false;
         this.variCxt.imageSmoothingQuality = "high"
         this.variCxt.drawImage(img, 0, 0);
+        this.drawImg()
       };
-      img.src = this.imageLink;
     }
   }
 
   async drawImg() {
+    this.openCVLoadResult = this.ngOpenCVService.isReady$;
+    let canvas = this.variCanvas.nativeElement
+    let src = new cv.Mat()
+    src = cv.imread(canvas.id);
+    if (this.variCxt != undefined) {
+      this.variCxt.clearRect(0, 0, canvas.width, canvas.heigh);
+    }
+    let rgbaPlanes = new cv.MatVector();
+    cv.split(src, rgbaPlanes);
+    let red = rgbaPlanes.get(0);
+    let green = rgbaPlanes.get(1);
+    let blue = rgbaPlanes.get(2);
+    rgbaPlanes.delete();
+    
+    let dst1 = new cv.Mat();
+    let dst2 = new cv.Mat();
+    let dst3 = new cv.Mat();
+    let mask = new cv.Mat();
+    let dtype = -1;
+    cv.subtract(green, red, dst1, mask, dtype)
+    cv.add(green, red, dst2, mask, dtype)
+    cv.subtract(dst2, blue, dst3, mask, dtype)
+    red.delete(); green.delete(); blue.delete(); dst2.delete(); mask.delete(); 
+    dst1.mul(dst3, -1);
+    dst3.delete();
+    cv.imshow('vari', dst1);
+    src.delete(); dst1.delete();  //colour.delete(); 
+    this.createVARIButtonDisabled = false;   
+  }
+
+  drawColourMap(){
+    this.openCVLoadResult = this.ngOpenCVService.isReady$;
     this.createVARIButtonDisabled = true
+    this.creatingVARICmap = true;
     new Promise(resolve => setTimeout(resolve, 500)).then(()=>{
       let canvas = this.variCanvas.nativeElement
       let src = new cv.Mat()
       src = cv.imread(canvas.id);
-      if (this.variCxt != undefined) {
-        this.variCxt.clearRect(0, 0, canvas.width, canvas.heigh);
-      }
-      let rgbaPlanes = new cv.MatVector();
-      cv.split(src, rgbaPlanes);
-      let red = rgbaPlanes.get(0);
-      let green = rgbaPlanes.get(1);
-      let blue = rgbaPlanes.get(2);
-      rgbaPlanes.delete();
-      
-      let dst1 = new cv.Mat();
-      let dst2 = new cv.Mat();
-      let dst3 = new cv.Mat();
-      let mask = new cv.Mat();
-      let dtype = -1;
-      cv.subtract(green, red, dst1, mask, dtype)
-      cv.add(green, red, dst2, mask, dtype)
-      cv.subtract(dst2, blue, dst3, mask, dtype)
-      red.delete(); green.delete(); blue.delete(); dst2.delete(); mask.delete(); 
-      dst1.mul(dst3, -1);
-      dst3.delete();
-      let minMax = cv.minMaxLoc(dst1)
-      cv.cvtColor(dst1, dst1, cv.COLOR_GRAY2RGBA, 0)
-      let variCustomCmap = [
-        {
-          index: 0,
-          rgb: [0, 0, 255]
-        },
-        {
-          index: 1,
-          rgb: [0, 255, 0]
-        }
-      ]
+      let dst = new cv.Mat();
+      cv.cvtColor(src, dst, cv.COLOR_RGBA2GRAY, 0)
+      let minMax = cv.minMaxLoc(dst)
+      console.log(minMax)
+      cv.cvtColor(dst, dst, cv.COLOR_GRAY2RGBA, 0)
       let cmapVARI = colormap({
         colormap: "cool",
         nshades: minMax.maxVal+1,
         format: 'rba',
         alpha: [255, 255]
       })
-      let colour = new cv.Mat(dst1.rows, dst1.cols, cv.CV_8UC4, new cv.Scalar(0,0,0))
-      for (let row = 0; row < dst1.rows; row++) {
-        for (let col = 0; col < dst1.cols; col++) {
-          var pixel = dst1.ucharPtr(row, col)[0];
+      let colour = new cv.Mat(dst.rows, dst.cols, cv.CV_8UC4, new cv.Scalar(0,0,0))
+      for (let row = 0; row < dst.rows; row++) {
+        for (let col = 0; col < dst.cols; col++) {
+          var pixel = dst.ucharPtr(row, col)[0];
           var newPixel = cmapVARI[pixel]
           colour.ucharPtr(row, col)[0] = newPixel[0]
           colour.ucharPtr(row, col)[1] = newPixel[1]
@@ -292,19 +313,12 @@ export class Tab2Page implements ViewDidEnter{
         }
       }
       cv.imshow('vari', colour);
-      src.delete(); colour.delete(); dst1.delete();  
+      src.delete(); dst.delete(); colour.delete(); 
       this.variFinished()
       this.createVARIButtonDisabled = false
-      console.log('finished')    
-    });
-  }
-
-  getIndexVARI(red: number, green: number, blue: number){
-    if ((green+red) == blue) {
-      return (green-red)/(green+red-blue+1)
-    } else {
-      return (green-red)/(green+red-blue)
-    }
+      this.creatingVARICmap = false;
+      console.log('finished')   
+    })      
   }
 
   fetchData() {
@@ -360,8 +374,12 @@ export class Tab2Page implements ViewDidEnter{
       let lastImgPath = newImagePath
       let imageRef = this.fbStorage.ref("/" + lastImgPath).getDownloadURL()
       imageRef.forEach(async (val) =>{
+        this.creatingTimelapse = true;
+        this.creatingVARICmap = true;
         this.imageLink = await this.getBase64ImageFromUrl(val)
         //console.log(this.imageLink)
+        this.creatingTimelapse = false;
+        this.creatingVARICmap = false;
         this.showImg()
       })
       this.imageRefTimeStamp = new Date(newImageStamp).toLocaleString('en-ZA');

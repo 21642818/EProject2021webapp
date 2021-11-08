@@ -40,7 +40,7 @@ export class Tab1Page implements ViewDidEnter{
   pastDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   prefersDark = false;
-  waterLevelFlag: boolean;
+  waterLevelFull: boolean;
 
   constructor(private firebaseApi: FirebaseService, public fb: FormBuilder, private alertController: AlertController) {
     Chart.register(annotationPlugin);
@@ -104,7 +104,7 @@ export class Tab1Page implements ViewDidEnter{
   }
 
   submitCmd() {
-    if (this.waterLevelFlag) {
+    if (this.waterLevelFull == false) {
       this.waterLevelAlert()
     } else {
       this.waterButtonDisabled = true;
@@ -224,6 +224,16 @@ export class Tab1Page implements ViewDidEnter{
   }
 
   fetchData() {
+    let floatSwitchRes = this.firebaseApi.getFlag();
+    floatSwitchRes.snapshotChanges().subscribe((res) => {
+      if (res.length > 0) {
+        let resSize = res.length-1
+        this.waterLevelFull = res[resSize].payload.val().float_switch
+      } else {
+        this.waterLevelFull = true
+        //console.log('flags empty')
+      }
+    })    
     let calibrationRes = this.firebaseApi.getCalibration();
     calibrationRes.snapshotChanges().subscribe(res => {
       let resSize = res.length-1
@@ -259,7 +269,7 @@ export class Tab1Page implements ViewDidEnter{
         Object.keys(val).map((k) => {
           //resArray.push(val[k]);
           let timestamp = val[k]["date"]+"T"+val[k]["timestamp"]
-          let waterLevelFlag = val[k]["float_switch"]
+          let waterLevelFull = val[k]["float_switch"]
           let soilArr = val[k]["soil_moisture"];
           for (let index = 0; index < soilArr.length; index++) {
             let value = soilArr[index];
@@ -271,19 +281,18 @@ export class Tab1Page implements ViewDidEnter{
             };
             soilArr[index] = newValue;
           }
-          resArray.push(new lineDataSet(timestamp,soilArr,waterLevelFlag));
+          resArray.push(new lineDataSet(timestamp,soilArr,waterLevelFull));
           return resArray;
         });
       });
       this.dataList = resArray;
       this.firstDate = resArray[0].timestamp
-      this.waterLevelFlag = resArray[resArray.length-1].waterLevelFlag
       if (this.chartData) {
         this.updateCharts(resArray)
       } else {
         this.createCharts(resArray)
       }
-      if (this.waterLevelFlag) {
+      if (this.waterLevelFull == false) {
         this.waterLevelAlert()
       }
     });    
@@ -554,12 +563,12 @@ export class Tab1Page implements ViewDidEnter{
 export class lineDataSet {
   timestamp: Date;
   soilMoisture: Number [];
-  waterLevelFlag: boolean;
+  waterLevelFull: boolean;
 
-  constructor( timestamp, soilMoisture, waterLevelFlag) {
+  constructor( timestamp, soilMoisture, waterLevelFull) {
     this.timestamp = new Date(Date.parse(timestamp));
     this.soilMoisture = soilMoisture;
-    this.waterLevelFlag = waterLevelFlag
+    this.waterLevelFull = waterLevelFull
   }
 }
 
